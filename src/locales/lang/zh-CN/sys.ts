@@ -86,10 +86,12 @@ export default {
     smsPlaceholder: '请输入验证码',
     mobilePlaceholder: '请输入手机号码',
     policyPlaceholder: '勾选后才能注册',
+    captchaPlaceholder:'请输入图片验证码',
     diffPwd: '两次输入密码不一致',
 
     userName: '账号',
     password: '密码',
+    validatecode: '图片验证码',
     confirmPassword: '确认密码',
     email: '邮箱',
     smsCode: '短信验证码',

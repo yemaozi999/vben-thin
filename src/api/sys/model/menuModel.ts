@@ -1,7 +1,7 @@
 import type { RouteMeta } from 'vue-router';
 export interface RouteItem {
   path: string;
-  component: any;
+/*  component: any;*/
   meta: RouteMeta;
   name?: string;
   alias?: string | string[];
@@ -10,7 +10,11 @@ export interface RouteItem {
   children?: RouteItem[];
 }
 
+export interface ReturnMenuResult{
+  menus:RouteItem[]
+}
+
 /**
  * @description: Get menu return value
  */
-export type getMenuListResultModel = RouteItem[];
+export type getMenuListResultModel = ReturnMenuResult;

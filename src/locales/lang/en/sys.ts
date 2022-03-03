@@ -92,10 +92,12 @@ export default {
     smsPlaceholder: 'Please input sms code',
     mobilePlaceholder: 'Please input mobile',
     policyPlaceholder: 'Register after checking',
+    captchaPlaceholder:'Please input validate code',
     diffPwd: 'The two passwords are inconsistent',
 
     userName: 'Username',
     password: 'Password',
+    validatecode:"Validate Code",
     confirmPassword: 'Confirm Password',
     email: 'Email',
     smsCode: 'SMS code',

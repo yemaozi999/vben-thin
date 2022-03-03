@@ -1,13 +1,15 @@
 import { defHttp } from '/@/utils/http/axios';
-import { LoginParams, LoginResultModel, GetUserInfoModel } from './model/userModel';
+import { LoginParams, LoginResultModel, GetUserInfoModel, SetUserAuthorityModel } from './model/userModel';
 
 import { ErrorMessageMode } from '/#/axios';
 
 enum Api {
-  Login = '/login',
-  Logout = '/logout',
-  GetUserInfo = '/getUserInfo',
+  Login = 'base/login',
+  Logout = '/jwt/jsonInBlacklist',
+  GetUserInfo = '/user/getUserInfo',
   GetPermCode = '/getPermCode',
+  Captcha = '/base/captcha',
+  SetUserAuthority = '/user/setUserAuthority'
 }
 
 /**
@@ -37,5 +39,13 @@ export function getPermCode() {
 }
 
 export function doLogout() {
-  return defHttp.get({ url: Api.Logout });
+  return defHttp.post({ url: Api.Logout });
+}
+
+export function captcha(){
+  return defHttp.post<any>({ url: Api.Captcha });
+}
+
+export function setUserAuthority(params:SetUserAuthorityModel){
+  return defHttp.post<any>({ url: Api.SetUserAuthority,params });
 }

@@ -8,10 +8,10 @@
     v-show="getShow"
     @keypress.enter="handleLogin"
   >
-    <FormItem name="account" class="enter-x">
+    <FormItem name="username" class="enter-x">
       <Input
         size="large"
-        v-model:value="formData.account"
+        v-model:value="formData.username"
         :placeholder="t('sys.login.userName')"
         class="fix-auto-fill"
       />
@@ -24,6 +24,26 @@
         :placeholder="t('sys.login.password')"
       />
     </FormItem>
+
+    <FormItem name="captcha" class="enter-x">
+      <Input v-model:value="formData.captcha"
+      :placeholder="t('sys.login.validatecode')"
+      >
+        <template #suffix>
+          <a-tooltip title="Extra information">
+            <img class="validate-img" :src="picPath" alt="请输入验证码" data-v-a3ccadca="" @click="changePic">
+          </a-tooltip>
+        </template>
+      </Input>
+    </FormItem>
+
+
+      <Input type="hidden"
+        v-model:value="formData.username"
+      />
+
+
+
 
     <ARow class="enter-x">
       <ACol :span="12">
@@ -82,7 +102,7 @@
   </Form>
 </template>
 <script lang="ts" setup>
-  import { reactive, ref, unref, computed } from 'vue';
+  import { reactive, ref, unref, computed,onMounted } from 'vue';
 
   import { Checkbox, Form, Input, Row, Col, Button, Divider } from 'ant-design-vue';
   import {
@@ -102,6 +122,8 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   //import { onKeyStroke } from '@vueuse/core';
 
+  import { captcha } from '/@/api/sys/user';
+
   const ACol = Col;
   const ARow = Row;
   const FormItem = Form.Item;
@@ -118,31 +140,53 @@
   const loading = ref(false);
   const rememberMe = ref(false);
 
+  const picPath = ref();
+
   const formData = reactive({
-    account: 'vben',
+    username: 'admin',
     password: '123456',
+    captcha:'',
+    captchaId:'',
   });
 
   const { validForm } = useFormValid(formRef);
 
   //onKeyStroke('Enter', handleLogin);
 
+  onMounted(()=>{
+    captcha().then(res=>{
+      picPath.value = res.picPath
+      formData.captchaId = res.captchaId
+    })
+  })
+
+  const changePic=()=>{
+    captcha().then(res=>{
+      picPath.value = res.picPath
+      formData.captchaId = res.captchaId
+    })
+  }
+
   const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
 
   async function handleLogin() {
     const data = await validForm();
+    console.log(data);
     if (!data) return;
     try {
       loading.value = true;
       const userInfo = await userStore.login({
         password: data.password,
-        username: data.account,
-        mode: 'none', //不要默认的错误提示
+        username: data.username,
+        captcha:data.captcha,
+        captchaId:formData.captchaId,
+        mode:"none"
       });
+
       if (userInfo) {
         notification.success({
           message: t('sys.login.loginSuccessTitle'),
-          description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.realName}`,
+          description: `${t('sys.login.loginSuccessDesc')}: ${userInfo.nickName}`,
           duration: 3,
         });
       }
@@ -152,8 +196,18 @@
         content: (error as unknown as Error).message || t('sys.api.networkExceptionMsg'),
         getContainer: () => document.body.querySelector(`.${prefixCls}`) || document.body,
       });
+      changePic()
     } finally {
       loading.value = false;
     }
   }
 </script>
+<style lang="less" scoped>
+.validate-img{
+  height:100%;
+  width:80px;
+  position: absolute;
+  top:0;
+  right:0;
+}
+</style>

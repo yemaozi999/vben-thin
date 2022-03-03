@@ -18,6 +18,18 @@
           v-if="getShowDoc"
         />
         <MenuDivider v-if="getShowDoc" />
+
+<!-- 判断是否有多个角色 有的话就可以切换角色
+-->
+        <div v-if="getUserInfo.authorities">
+        <MenuItem v-for="item in getUserInfo.authorities" :key="item"
+          :text="item.authorityId==getUserInfo.authorityId?'当前角色:'+item.authorityName:'切换为:'+item.authorityName"
+                  :class="{role_checked:item.authorityId==getUserInfo.authorityId}"
+          icon="ion:lock-closed-outline"
+                  @click="handleChangeAuthority(item.authorityId)"
+        />
+        </div>
+
         <MenuItem
           v-if="getUseLockPage"
           key="lock"
@@ -48,7 +60,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useModal } from '/@/components/Modal';
 
-  import headerImg from '/@/assets/images/header.jpg';
+/*  import headerImg from '/@/assets/images/header.jpg';*/
   import { propTypes } from '/@/utils/propTypes';
   import { openWindow } from '/@/utils';
 
@@ -75,8 +87,8 @@
       const userStore = useUserStore();
 
       const getUserInfo = computed(() => {
-        const { realName = '', avatar, desc } = userStore.getUserInfo || {};
-        return { realName, avatar: avatar || headerImg, desc };
+        const { userName, headerImg, authorities,authorityId } = userStore.getUserInfo || {};
+        return { realName:userName, avatar: headerImg, desc:"" ,authorities,authorityId};
       });
 
       const [register, { openModal }] = useModal();
@@ -93,6 +105,12 @@
       // open doc
       function openDoc() {
         openWindow(DOC_URL);
+      }
+
+      function handleChangeAuthority(authorityId:string){
+        if(authorityId!=getUserInfo.value.authorityId) {
+          userStore.changeAuthority(authorityId)
+        }
       }
 
       function handleMenuClick(e: { key: MenuEvent }) {
@@ -117,6 +135,7 @@
         getShowDoc,
         register,
         getUseLockPage,
+        handleChangeAuthority
       };
     },
   });
@@ -172,5 +191,10 @@
         min-width: 160px;
       }
     }
+  }
+
+  .role_checked{
+    color: #606266;
+    font-weight: 600;
   }
 </style>

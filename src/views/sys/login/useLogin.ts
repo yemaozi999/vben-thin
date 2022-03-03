@@ -45,6 +45,8 @@ export function useFormRules(formData?: Recordable) {
   const getPasswordFormRule = computed(() => createRule(t('sys.login.passwordPlaceholder')));
   const getSmsFormRule = computed(() => createRule(t('sys.login.smsPlaceholder')));
   const getMobileFormRule = computed(() => createRule(t('sys.login.mobilePlaceholder')));
+  const getCaptchaFormRule = computed(() => createRule(t('sys.login.captchaPlaceholder')));
+  const getCaptchaIdFormRule = computed(() => createRule(t('sys.login.captchaPlaceholder')));
 
   const validatePolicy = async (_: RuleObject, value: boolean) => {
     return !value ? Promise.reject(t('sys.login.policyPlaceholder')) : Promise.resolve();
@@ -64,6 +66,8 @@ export function useFormRules(formData?: Recordable) {
 
   const getFormRules = computed((): { [k: string]: ValidationRule | ValidationRule[] } => {
     const accountFormRule = unref(getAccountFormRule);
+    const captchaFormRule = unref(getCaptchaFormRule);
+    const captchaIdFormRule = unref(getCaptchaIdFormRule);
     const passwordFormRule = unref(getPasswordFormRule);
     const smsFormRule = unref(getSmsFormRule);
     const mobileFormRule = unref(getMobileFormRule);
@@ -99,8 +103,10 @@ export function useFormRules(formData?: Recordable) {
       // login form rules
       default:
         return {
-          account: accountFormRule,
+          username: accountFormRule,
           password: passwordFormRule,
+          captcha: captchaFormRule,
+          captchaId:captchaIdFormRule
         };
     }
   });
