@@ -54,11 +54,14 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
   });
   const list = treeMap(routeList, {
     conversion: (node: AppRouteRecordRaw) => {
-      const { meta: { title, hideMenu = false } = {} } = node;
+      const { meta: { title, hideMenu = false} = {} } = node;
+
+      const mixmeta = node.meta
+      mixmeta.btns = node.btns
 
       return {
         ...(node.meta || {}),
-        meta: node.meta,
+        meta: mixmeta,
         name: title,
         hideMenu,
         path: node.path,
@@ -66,6 +69,7 @@ export function transformRouteToMenu(routeModList: AppRouteModule[], routerMappi
       };
     },
   });
+
   joinParentPath(list);
   return cloneDeep(list);
 }

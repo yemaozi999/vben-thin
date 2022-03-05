@@ -158,6 +158,13 @@ const transform: AxiosTransform = {
       userStore.setToken(res.headers['new-token']);
 
     }
+    if(res.headers['new-expires-at']){
+      console.log(res.headers['new-expires-at'])
+      const userStore = useUserStoreWithOut();
+      userStore.setExpiresAt(res.headers['new-expires-at']*1000);
+    }
+
+
     return res;
   },
 

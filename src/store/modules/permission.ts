@@ -25,6 +25,8 @@ import { useMessage } from '/@/hooks/web/useMessage';
 import { PageEnum } from '/@/enums/pageEnum';
 import { getMenuListResultModel } from '/@/api/sys/model/menuModel';
 
+import {MENU_KEY} from '/@/enums/cacheEnum';
+import { getAuthCache, setAuthCache } from '/@/utils/auth';
 
 
 interface PermissionState {
@@ -56,7 +58,7 @@ export const usePermissionStore = defineStore({
       return this.permCodeList;
     },
     getBackMenuList(): Menu[] {
-      return this.backMenuList;
+      return this.backMenuList|| getAuthCache<Menu[]>(MENU_KEY)||[];
     },
     getFrontMenuList(): Menu[] {
       return this.frontMenuList;
@@ -76,6 +78,7 @@ export const usePermissionStore = defineStore({
     setBackMenuList(list: Menu[]) {
       this.backMenuList = list;
       list?.length > 0 && this.setLastBuildMenuTime();
+      setAuthCache(MENU_KEY, list);
     },
 
     setFrontMenuList(list: Menu[]) {
@@ -168,9 +171,9 @@ export const usePermissionStore = defineStore({
           const menuList = transformRouteToMenu(routes, true);
           routes = filter(routes, routeRemoveIgnoreFilter);
           routes = routes.filter(routeRemoveIgnoreFilter);
-          menuList.sort((a, b) => {
+          /*menuList.sort((a, b) => {
             return (a.meta?.orderNo || 0) - (b.meta?.orderNo || 0);
-          });
+          });*/
 
           this.setFrontMenuList(menuList);
           // Convert multi-level routing to level 2 routing
@@ -197,19 +200,18 @@ export const usePermissionStore = defineStore({
           } catch (error) {
             console.error(error);
           }
-
           // Dynamically introduce components
           routeList = transformObjToRoute(routeList);
-
           //  Background routing to menu structure
           const backMenuList = transformRouteToMenu(routeList);
+
           this.setBackMenuList(backMenuList);
 
           // remove meta.ignoreRoute item
           routeList = filter(routeList, routeRemoveIgnoreFilter);
           routeList = routeList.filter(routeRemoveIgnoreFilter);
-
           routeList = flatMultiLevelRoutes(routeList);
+
           routes = [PAGE_NOT_FOUND_ROUTE, ...routeList];
           break;
       }

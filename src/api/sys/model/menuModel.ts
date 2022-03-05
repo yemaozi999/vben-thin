@@ -8,6 +8,7 @@ export interface RouteItem {
   redirect?: string;
   caseSensitive?: boolean;
   children?: RouteItem[];
+  btns?:string[];
 }
 
 export interface ReturnMenuResult{

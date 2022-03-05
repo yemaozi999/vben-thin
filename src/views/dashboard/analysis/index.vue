@@ -7,6 +7,10 @@
       <VisitSource class="md:w-1/3 !md:mx-4 !md:my-0 !my-4 w-full" :loading="loading" />
       <SalesProductPie class="md:w-1/3 w-full" :loading="loading" />
     </div>
+<!--    <a v-auth="btnAuth.ybpbtn" href="https://www.baidu.com">发打发打发</a>
+    <a v-auth="['888']" href="https://www.baidu.com">发打发打发</a>
+    <a v-auth="888" href="https://www.baidu.com">发打发打发</a>-->
+
   </div>
 </template>
 <script lang="ts" setup>
@@ -16,6 +20,9 @@
   import VisitSource from './components/VisitSource.vue';
   import VisitRadar from './components/VisitRadar.vue';
   import SalesProductPie from './components/SalesProductPie.vue';
+
+/*  import { useBtnAuth } from '/@/utils/btnAuth'
+  const btnAuth = useBtnAuth()*/
 
   const loading = ref(true);
 

@@ -25,7 +25,7 @@
         <MenuItem v-for="item in getUserInfo.authorities" :key="item"
           :text="item.authorityId==getUserInfo.authorityId?'当前角色:'+item.authorityName:'切换为:'+item.authorityName"
                   :class="{role_checked:item.authorityId==getUserInfo.authorityId}"
-          icon="ion:lock-closed-outline"
+          icon="ant-design:user-delete-outlined"
                   @click="handleChangeAuthority(item.authorityId)"
         />
         </div>
@@ -60,7 +60,7 @@
   import { useDesign } from '/@/hooks/web/useDesign';
   import { useModal } from '/@/components/Modal';
 
-/*  import headerImg from '/@/assets/images/header.jpg';*/
+  /*  import headerImg from '/@/assets/images/header.jpg';*/
   import { propTypes } from '/@/utils/propTypes';
   import { openWindow } from '/@/utils';
 
@@ -111,6 +111,7 @@
         if(authorityId!=getUserInfo.value.authorityId) {
           userStore.changeAuthority(authorityId)
         }
+
       }
 
       function handleMenuClick(e: { key: MenuEvent }) {

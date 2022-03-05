@@ -1,6 +1,8 @@
 // token key
 export const TOKEN_KEY = 'TOKEN__';
 
+export const EXPIRESAT_KEY = 'EXPIRESAT__';
+
 export const LOCALE_KEY = 'LOCALE__';
 
 // user info key
@@ -24,6 +26,9 @@ export const APP_LOCAL_CACHE_KEY = 'COMMON__LOCAL__KEY__';
 
 // base global session key
 export const APP_SESSION_CACHE_KEY = 'COMMON__SESSION__KEY__';
+
+// base menu key
+export const MENU_KEY = 'MENU__';
 
 export enum CacheTypeEnum {
   SESSION,

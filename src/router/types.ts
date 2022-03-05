@@ -10,12 +10,13 @@ export type Component<T = any> =
 // @ts-ignore
 export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, 'meta'> {
   name: string;
-  meta: RouteMeta;
+  meta: RouteMeta|{btns:any};
   component?: Component | string;
   components?: Component;
   children?: AppRouteRecordRaw[];
   props?: Recordable;
   fullPath?: string;
+  btns?:any
 }
 
 export interface MenuTag {
@@ -42,11 +43,13 @@ export interface Menu {
 
   roles?: RoleEnum[];
 
-  meta?: Partial<RouteMeta>;
+  meta?: Partial<RouteMeta|{btns:any}>;
 
   tag?: MenuTag;
 
   hideMenu?: boolean;
+
+  btns?:string[];
 }
 
 export interface MenuModule {

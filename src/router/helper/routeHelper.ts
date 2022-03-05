@@ -82,6 +82,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
         const meta = route.meta || {};
         meta.single = true;
         meta.affix = false;
+        meta.btns = route.btns
         route.meta = meta;
       }
     } else {

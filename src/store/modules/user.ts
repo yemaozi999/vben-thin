@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 import { store } from '/@/store';
 import { RoleEnum } from '/@/enums/roleEnum';
 import { PageEnum } from '/@/enums/pageEnum';
-import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY } from '/@/enums/cacheEnum';
+import { ROLES_KEY, TOKEN_KEY, USER_INFO_KEY,EXPIRESAT_KEY } from '/@/enums/cacheEnum';
 import { getAuthCache, setAuthCache } from '/@/utils/auth';
 import {  LoginParams ,UserInfo} from '/@/api/sys/model/userModel';
 import { doLogout, getUserInfo, loginApi, setUserAuthority } from '/@/api/sys/user';
@@ -15,6 +15,8 @@ import { usePermissionStore } from '/@/store/modules/permission';
 import { RouteRecordRaw } from 'vue-router';
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 
+import { usePermission } from '/@/hooks/web/usePermission';
+
 import { h } from 'vue';
 
 interface UserState {
@@ -23,6 +25,7 @@ interface UserState {
   roleList: RoleEnum[];
   sessionTimeout?: boolean;
   lastUpdateTime: number;
+  expiresAt?:number;
 }
 
 export const useUserStore = defineStore({
@@ -38,11 +41,16 @@ export const useUserStore = defineStore({
     sessionTimeout: false,
     // Last fetch time
     lastUpdateTime: 0,
+    // ExpiresAt token过期时间
+    expiresAt:0,
   }),
 
   getters: {
     getUserInfo(): UserInfo {
       return this.userInfo || getAuthCache<UserInfo>(USER_INFO_KEY) || {};
+    },
+    getExpiresAt():number{
+      return this.expiresAt || getAuthCache<number>(EXPIRESAT_KEY) || 0;
     },
     getToken(): string {
       return this.token || getAuthCache<string>(TOKEN_KEY);
@@ -71,6 +79,10 @@ export const useUserStore = defineStore({
       this.token = info ? info : ''; // for null or undefined value
       setAuthCache(TOKEN_KEY, info);
     },
+    setExpiresAt(time: number | undefined) {
+      this.expiresAt = time ? time : 0; // for null or undefined value
+      setAuthCache(EXPIRESAT_KEY, time);
+    },
     setRoleList(roleList: RoleEnum[]) {
       this.roleList = roleList;
       setAuthCache(ROLES_KEY, roleList);
@@ -88,6 +100,7 @@ export const useUserStore = defineStore({
       this.token = '';
       this.roleList = [];
       this.sessionTimeout = false;
+      this.expiresAt = 0;
     },
     /**
      * @description: login
@@ -101,10 +114,11 @@ export const useUserStore = defineStore({
       try {
         const { goHome = true, mode, ...loginParams } = params;
         const data = await loginApi(loginParams, mode);
-        const { token } = data;
+        const { token,expiresAt } = data;
 
         // save token
         this.setToken(token);
+        this.setExpiresAt(expiresAt);
         return this.afterLoginAction(goHome);
       } catch (error) {
         return Promise.reject(error);
@@ -129,12 +143,22 @@ export const useUserStore = defineStore({
           router.addRoute(PAGE_NOT_FOUND_ROUTE as unknown as RouteRecordRaw);
           permissionStore.setDynamicAddedRoute(true);
         }
+
+        const { refreshMenu } = usePermission();
+        await refreshMenu();
+
         goHome && (await router.replace(PageEnum.BASE_HOME));
       }
       return userInfo;
     },
     async getUserInfoAction(): Promise<UserInfo | null> {
       if (!this.getToken) return null;
+
+      if(this.getExpiresAt>0&&this.getExpiresAt<(Date.parse(new Date().toString()))){
+        await this.logout(true);
+        return null
+      }
+
       const userInfoResult = await getUserInfo();
       /*const { roles = [] } = userInfo;
       if (isArray(roles)) {
@@ -144,6 +168,7 @@ export const useUserStore = defineStore({
         userInfo.roles = [];
         this.setRoleList([]);
       }*/
+
       this.setUserInfo(userInfoResult.userInfo);
       return userInfoResult.userInfo;
     },
@@ -161,6 +186,7 @@ export const useUserStore = defineStore({
       this.setToken(undefined);
       this.setSessionTimeout(false);
       this.setUserInfo(null);
+      this.setExpiresAt(0);
       goLogin && router.push(PageEnum.BASE_LOGIN);
     },
 
